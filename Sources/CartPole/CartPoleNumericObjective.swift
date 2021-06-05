@@ -48,10 +48,10 @@ struct CartPoleNumericObjective {
     }
 
     func startPoint() throws -> (primal: Vector, dual: Vector) {
-        // var primal = zeros(self.numVariables)
-        // var dual = zeros(self.equalityConstraintMatrix!.rows)
-        var primal = zeros(1)
-        var dual = zeros(1)
+        var primal = zeros(self.numVariables)
+        var dual = zeros(self.equalityConstraintMatrix!.rows)
+        // var primal = zeros(1)
+        // var dual = zeros(1)
 
         if let warmStartPrimal = self.warmStartPrimal {
             primal = warmStartPrimal

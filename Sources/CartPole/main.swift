@@ -11,7 +11,7 @@ struct CartPole: ParsableCommand {
     static var configuration = CommandConfiguration(
         abstract: "Cart pole MPC examples.",
         version: "0.0.1",
-        subcommands: [CodeGen.self])
+        subcommands: [CodeGen.self, Balance.self])
 }
 
 struct  CodeGenOptions: ParsableArguments {
@@ -34,6 +34,22 @@ extension CartPole {
                 try mpc.codeGen(toFile: filename)
             } catch {
                 print("Unable to generate code: \(error)")
+                return
+            }
+        }
+    }
+
+    struct Balance: ParsableCommand {
+        static var configuration = CommandConfiguration(abstract: "Run the cart pole balance example")
+
+        mutating func run() {
+            do {
+                var cartPoleMPC = CartPoleMPC(numSteps: 20)
+                let (min, pt) = try cartPoleMPC.runNumeric()
+                print("Minimum: \(min)")
+                print("Point: \(pt)")
+            } catch {
+                print("An unexpected error was thrown: \(error)")
                 return
             }
         }

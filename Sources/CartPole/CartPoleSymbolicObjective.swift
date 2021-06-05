@@ -126,7 +126,7 @@ extension CartPoleMPC {
             let linear_acceleration_2: Node = k*force[t-1]/(poleMass*Power(Cos(previousAngle[t]), Number(2)) - k*(cartMass + poleMass))
             let linear_acceleration_3: Node = k*poleLength*Sin(previousAngle[t])/(Power(Cos(previousAngle[t]), Number(2)) - k*(cartMass/poleMass + 1)) * Power(angularVelocity[t-1], Number(2)).taylorExpand(in: angularVelocity[t-1], about: previousAngularVelocity[t], ofOrder: 1)!
 
-            eqConstraints.append( velocity[t] ≈ velocity[t-1] + self.mpc_dt*(linear_acceleration_1 - linear_acceleration_2 - linear_acceleration_3) )
+            eqConstraints.append( velocity[t] ≈ velocity[t-1] + self.mpc_dt*linear_acceleration_1 - self.mpc_dt*linear_acceleration_2 - self.mpc_dt*linear_acceleration_3 )
             
             // Angle Constraint
             eqConstraints.append( angle[t] ≈ angle[t-1] + self.mpc_dt*angularVelocity[t-1] )
@@ -136,12 +136,12 @@ extension CartPoleMPC {
             let angular_acceleration_2: Node = force[t-1]/(k*(cartMass + poleMass)*poleLength - poleMass*poleLength*Cos(previousAngle[t]))
             let angular_acceleration_3: Node = Sin(previousAngle[t])/(k*(cartMass/poleMass + 1) - Cos(previousAngle[t])) * Power(angularVelocity[t-1], Number(2)).taylorExpand(in: angularVelocity[t-1], about: previousAngularVelocity[t], ofOrder: 1)!
 
-            eqConstraints.append( angularVelocity[t] ≈ angularVelocity[t-1] + self.mpc_dt*(angular_acceleration_1 - angular_acceleration_2 - angular_acceleration_3) )
+            eqConstraints.append( angularVelocity[t] ≈ angularVelocity[t-1] + self.mpc_dt*angular_acceleration_1 - self.mpc_dt*angular_acceleration_2 - self.mpc_dt*angular_acceleration_3 )
         }
 
         //======== Objective ========
 
-        let objectiveNode: Node = sum(angle) + sum(position)
+        let objectiveNode: Node = sum(angle.**2) + sum(position.**2)
 
         guard let objective = SymbolicObjective(min: objectiveNode, subjectTo: SymbolicVector(ineqConstraints), equalityConstraints: eqConstraints, ordering: ordering, parameterValues: initialParameterValues) else {
             throw MPCError.misc("Unable to construct symbolic objective")

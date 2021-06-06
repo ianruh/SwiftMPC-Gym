@@ -118,7 +118,7 @@ extension CartPoleMPC {
         // Position and Velcoity
         for t in 1..<self.numTimeHorizonSteps {
             // Position constraint
-            eqConstraints.append( position[t] ≈ position[t-1] + self.mpc_dt*velocity[t-1] )
+            eqConstraints.append( position[t] ≈ position[t-1] + 0.5*self.mpc_dt*velocity[t-1] + 0.5*self.mpc_dt*velocity[t])
 
             // Velocity Constraint
             let k = Number(4.0/3.0)
@@ -129,7 +129,7 @@ extension CartPoleMPC {
             eqConstraints.append( velocity[t] ≈ velocity[t-1] + self.mpc_dt*linear_acceleration_1 - self.mpc_dt*linear_acceleration_2 - self.mpc_dt*linear_acceleration_3 )
             
             // Angle Constraint
-            eqConstraints.append( angle[t] ≈ angle[t-1] + self.mpc_dt*angularVelocity[t-1] )
+            eqConstraints.append( angle[t] ≈ angle[t-1] + 0.5*self.mpc_dt*angularVelocity[t-1] + 0.5*self.mpc_dt*angularVelocity[t])
 
             // Angular Velocity Constraint
             let angular_acceleration_1: Node = gravity*(cartMass + poleMass) * (Sin(angle[t-1])/(k*(cartMass+poleMass)*poleLength - poleMass*poleLength*Power(Cos(angle[t-1]), Number(2)))).taylorExpand(in: angle[t-1], about: previousAngle[t], ofOrder: 1)!
@@ -141,7 +141,8 @@ extension CartPoleMPC {
 
         //======== Objective ========
 
-        let objectiveNode: Node = sum(angle.**2) + sum(position.**2)
+        let objectiveNode: Node = sum(angle.**2) + sum(position.**2)*0.05
+        // let objectiveNode: Node = Sin(angle.last!)**2 + velocity.last!**2*0.001
 
         guard let objective = SymbolicObjective(min: objectiveNode, subjectTo: SymbolicVector(ineqConstraints), equalityConstraints: eqConstraints, ordering: ordering, parameterValues: initialParameterValues) else {
             throw MPCError.misc("Unable to construct symbolic objective")

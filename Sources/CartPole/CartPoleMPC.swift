@@ -7,10 +7,10 @@ import RealModule
 public struct CartPoleMPC {
     var numTimeHorizonSteps: Int
     var mpc_dt: Double
-    let maxForce: Double = 10.0
-    let minForce: Double = -10.0
-    let maxPosition: Double = 4.2
-    let minPosition: Double = -4.2
+    let maxForce: Double = 800.0
+    let minForce: Double = -800.0
+    let maxPosition: Double = 6.0
+    let minPosition: Double = -6.0
 
     // Parameter and variable storage. A bit ugly, but whatever
     var parameters: [String: Parameter] = [:]
@@ -23,7 +23,7 @@ public struct CartPoleMPC {
     var solver: InequalitySolver
     var numericObjective: CartPoleNumericObjective
 
-    public init(numSteps: Int, dt: Double = 0.05) {
+    public init(numSteps: Int, dt: Double = 0.7) {
         self.numTimeHorizonSteps = numSteps
         self.mpc_dt = dt
         self.solver = InequalitySolver()

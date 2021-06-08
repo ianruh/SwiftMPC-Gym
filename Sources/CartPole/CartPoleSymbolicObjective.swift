@@ -141,8 +141,8 @@ extension CartPoleMPC {
 
         //======== Objective ========
 
-        let objectiveNode: Node = sum(angle.**2) + sum(position.**2)*0.05
-        // let objectiveNode: Node = Sin(angle.last!)**2 + velocity.last!**2*0.001
+        // let objectiveNode: Node = sum(angle.**2) + sum(position.**2)*0.05
+        let objectiveNode: Node = angle.reduce(Number(0), { $0 - Cos($1) }) + sum(angularVelocity.**2)*0.05 + sum(position.**2)*0.05
 
         guard let objective = SymbolicObjective(min: objectiveNode, subjectTo: SymbolicVector(ineqConstraints), equalityConstraints: eqConstraints, ordering: ordering, parameterValues: initialParameterValues) else {
             throw MPCError.misc("Unable to construct symbolic objective")

@@ -11,7 +11,7 @@ NO_NUMERIC_OBJECTIVE = -Xswiftc -D -Xswiftc NO_NUMERIC_OBJECTIVE
 RELEASE = #-c release # Release build is broken on linux (compiler bug), so disabled for now
 
 build:
-	swift build $(RELEASE) $(UNCHECKED) $(FAST_MATH) $(COMPILER_OPT) $(EXTRAS)
+	swift build $(RELEASE) $(UNCHECKED) $(FAST_MATH) $(COMPILER_OPT) $(EXTRAS) $(NO_PRINT)
 
 build-debug:
 	swift build $(DEBUG) $(EXTRAS)

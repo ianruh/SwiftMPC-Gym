@@ -7,10 +7,10 @@ import RealModule
 public struct CartPoleMPC {
     var numTimeHorizonSteps: Int
     var mpc_dt: Double
-    let maxForce: Double = 800.0
-    let minForce: Double = -800.0
-    let maxPosition: Double = 6.0
-    let minPosition: Double = -6.0
+    let maxForce: Double = 50.0
+    let minForce: Double = -50.0
+    let maxPosition: Double = 10.0
+    let minPosition: Double = -10.0
 
     // Parameter and variable storage. A bit ugly, but whatever
     var parameters: [String: Parameter] = [:]
@@ -20,10 +20,10 @@ public struct CartPoleMPC {
     var variableVectors: [String: [Variable]] = [:]
     var variableMatrices: [String: [[Variable]]] = [:]
 
-    var solver: InequalitySolver
+    public var solver: InequalitySolver
     var numericObjective: CartPoleNumericObjective
 
-    public init(numSteps: Int, dt: Double = 0.7) {
+    public init(numSteps: Int, dt: Double = 0.1) {
         self.numTimeHorizonSteps = numSteps
         self.mpc_dt = dt
         self.solver = InequalitySolver()
@@ -62,10 +62,19 @@ public struct CartPoleMPC {
         self.numericObjective.initialAngularVelocity = angularVelocity
         // We also set the previous state here because it would be zero otherwise
         // May want to think more carefully about what we do here
-        self.numericObjective.previousPosition[0] = position
-        self.numericObjective.previousVelocity[0] = velocity
-        self.numericObjective.previousAngle[0] = angle
-        self.numericObjective.previousAngularVelocity[0] = angularVelocity
+        self.numericObjective.previousPosition.setAll(to: position)
+        self.numericObjective.previousVelocity.setAll(to: velocity)
+        self.numericObjective.previousAngle.setAll(to: angle)
+        self.numericObjective.previousAngularVelocity.setAll(to: angularVelocity)
+
+        let startPrimal = CartPoleNumericObjective.constructPrimal(
+            angle: Vector(repeating: angle, count: self.numTimeHorizonSteps),
+            angularVelocity: Vector(repeating: angularVelocity, count: self.numTimeHorizonSteps),
+            force: Vector(repeating: 0.0, count: self.numTimeHorizonSteps), // Initial control we'll let be zero
+            position: Vector(repeating: position, count: self.numTimeHorizonSteps),
+            velocity: Vector(repeating: velocity, count: self.numTimeHorizonSteps)
+        )
+        self.numericObjective.warmStartPrimal = startPrimal
     }
 
     public mutating func setSituationParameters(cartMass: Double, poleMass: Double, poleLength: Double, gravity: Double) {
@@ -102,7 +111,7 @@ public struct CartPoleMPC {
             "force": self.variableVectors["force"]!
         ]
 
-        try objective.printSwiftCode2(objectiveName: "CartPoleNumericObjective", parameterRepresentations: parameterRepresentations, vectorExtractors: vectorExtractors, toFile: fileName)
+        try objective.printSwiftCode2(objectiveName: "CartPoleNumericObjective", parameterRepresentations: parameterRepresentations, vectorExtractors: vectorExtractors, primalConstructor: true, toFile: fileName)
     }
 
     public mutating func runSymbolic() throws -> (minimum: Double, point: Vector) {

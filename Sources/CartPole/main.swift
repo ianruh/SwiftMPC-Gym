@@ -43,7 +43,7 @@ extension CartPole {
             do {
                 let gym = Python.import("gym")
                 let np = Python.import("numpy")
-                let env = gym.make("CartPole-v0")
+                let env = gym.make("CartPole-v0").env
 
                 var cartPoleMPC = CartPoleMPC(numSteps: 20)
                 cartPoleMPC.solver.hyperParameters.homotopyParameterStart = 400.0
@@ -52,6 +52,7 @@ extension CartPole {
                 // Set the simulation parameters
                 cartPoleMPC.setSituationParameters(cartMass: Double(env.masscart)!, poleMass: Double(env.masspole)!, poleLength: Double(env.length)!, gravity: Double(env.gravity)!)
 
+                while(true) {
                 // Set the initial conditions
                 var state = Array<Double>(env.reset())!
                 // cartPoleMPC.setInitialState(position: state[0], velocity: state[1], angle: state[2], angularVelocity: state[3])
@@ -60,7 +61,7 @@ extension CartPole {
                 // print("Initial Ineq Value: \(cartPoleMPC.numericObjective.inequalityConstraintsValue(primalStart))")
                 // print("Initial Ineq Gradient: \(cartPoleMPC.numericObjective.inequalityConstraintsGradient(primalStart))")
 
-                for t in 0..<200 {
+                for t in 0..<300 {
                     env.render()
                     cartPoleMPC.setInitialState(position: state[0], velocity: state[1], angle: state[2]-Double.pi*2.0, angularVelocity: state[3])
                     let start = Date()
@@ -68,6 +69,7 @@ extension CartPole {
                     let time = -1.0 * start.timeIntervalSinceNow * 1000.0
                     print("Step \(t), MPC step time (ms): \(time)")
                     state = Array<Double>(env.step(np.array([force, 0.0])))!
+                }
                 }
                 env.close()
             } catch {

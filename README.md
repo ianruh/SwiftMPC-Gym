@@ -1,6 +1,6 @@
 # SwiftMPC Gym
 
-This repository contains one (at the moment) experiment/proof of concept project working with the [SwiftMPC](https://github.com/ianruh/SwiftMPC) package. The proof of concept project currently in this repository solves the cartpole problem using the SwiftMPC package for control, and a fork of OpenAI Gym for the visualization.
+This repository contains one (at the moment) experiment/proof of concept project working with the [SwiftMPC](https://github.com/ianruh/SwiftMPC) package. The proof of concept project currently in this repository solves the cartpole problem using the SwiftMPC package for control, and [a fork of OpenAI Gym](https://github.com/ianruh/gym) for the visualization.
 
 ## Cartpole Proof of Concept
 

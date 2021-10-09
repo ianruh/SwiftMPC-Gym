@@ -55,11 +55,6 @@ extension CartPole {
                 while(true) {
                 // Set the initial conditions
                 var state = Array<Double>(env.reset())!
-                // cartPoleMPC.setInitialState(position: state[0], velocity: state[1], angle: state[2], angularVelocity: state[3])
-
-                // let (primalStart, dualStart) = try cartPoleMPC.numericObjective.startPoint()
-                // print("Initial Ineq Value: \(cartPoleMPC.numericObjective.inequalityConstraintsValue(primalStart))")
-                // print("Initial Ineq Gradient: \(cartPoleMPC.numericObjective.inequalityConstraintsGradient(primalStart))")
 
                 for t in 0..<300 {
                     env.render()
